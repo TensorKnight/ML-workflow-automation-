@@ -6,6 +6,10 @@ import uvicorn
 from core.config import settings
 from db.database import initialize_database, create_tables
 
+# Import routers
+from routers import workflows, blocks, connections, data_ingestion, data_preprocessing, feature_engineering
+from routers.health import router as health_router
+
 # Create FastAPI instance
 app = FastAPI(
     title=settings.app_name,
@@ -47,13 +51,14 @@ async def root():
     """Root endpoint"""
     return {"message": f"Welcome to {settings.app_name}"}
 
-@app.get("/health", response_model=HealthResponse)
-async def health_check():
-    """Health check endpoint"""
-    return HealthResponse(
-        status="healthy",
-        message=f"{settings.app_name} is running"
-    )
+# Include routers
+app.include_router(health_router)
+app.include_router(workflows.router)
+app.include_router(blocks.router)
+app.include_router(connections.router)
+app.include_router(data_ingestion.router)
+app.include_router(data_preprocessing.router)
+app.include_router(feature_engineering.router)
 
 if __name__ == "__main__":
     uvicorn.run(

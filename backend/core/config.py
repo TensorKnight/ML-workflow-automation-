@@ -17,9 +17,9 @@ class Settings(BaseSettings):
     # Database settings
     db_host: str = "localhost"
     db_port: int = 5432
-    db_name: str = "octoml_db"
-    db_user: str = "octoml_user"
-    db_password: str = "octoml_password"
+    db_name: str = "postgres"
+    db_user: str = "postgres"
+    db_password: str = "postgres"
     
     # Database URL
     @property

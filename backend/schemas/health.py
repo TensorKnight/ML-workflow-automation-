@@ -1,4 +1,4 @@
- """
+"""
 Health schemas
 """
 from pydantic import BaseModel

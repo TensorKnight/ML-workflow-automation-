@@ -102,12 +102,6 @@ const Navigation: React.FC = () => {
 
         {/* User Menu */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Chip
-            label="Free Plan"
-            size="small"
-            color="primary"
-            variant="outlined"
-          />
           <IconButton
             size="large"
             edge="end"

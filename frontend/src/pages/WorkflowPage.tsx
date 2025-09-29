@@ -264,19 +264,6 @@ const WorkflowPage: React.FC = () => {
                 </CardContent>
               </Card>
 
-              {/* Results Preview */}
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                    Results Preview
-                  </Typography>
-                  <Box sx={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Typography variant="body2" color="text.secondary">
-                      Results will appear here after model training
-                    </Typography>
-                  </Box>
-                </CardContent>
-              </Card>
             </Box>
           </Grid>
         </Grid>

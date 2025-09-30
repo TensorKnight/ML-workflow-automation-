@@ -9,6 +9,7 @@ from db.database import initialize_database, create_tables
 # Import routers
 from routers import workflows, blocks, connections, data_ingestion, data_preprocessing, feature_engineering
 from routers.health import router as health_router
+from routers.ml_execution import router as ml_execution_router
 
 # Create FastAPI instance
 app = FastAPI(
@@ -36,13 +37,13 @@ class HealthResponse(BaseModel):
 async def startup_event():
     """Initialize database on startup"""
     try:
-        print("🚀 Starting OctoML Backend...")
-        print("📊 Initializing database connection...")
+        print("Starting OctoML Backend...")
+        print("Initializing database connection...")
         initialize_database()
         create_tables()
-        print("✅ Database initialized successfully")
+        print("Database initialized successfully")
     except Exception as e:
-        print(f"❌ Database initialization failed: {e}")
+        print(f"Database initialization failed: {e}")
         raise
 
 # Routes
@@ -59,6 +60,7 @@ app.include_router(connections.router)
 app.include_router(data_ingestion.router)
 app.include_router(data_preprocessing.router)
 app.include_router(feature_engineering.router)
+app.include_router(ml_execution_router)
 
 if __name__ == "__main__":
     uvicorn.run(

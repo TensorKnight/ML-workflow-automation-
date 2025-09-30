@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navigation from '../components/Navigation'
+import { projectApi, Project } from '../services/api'
 import {
   Box,
   Container,
@@ -25,6 +26,7 @@ import {
   Select,
   Paper,
   Avatar,
+  Alert,
 } from '@mui/material'
 import {
   Add as AddIcon,
@@ -39,79 +41,43 @@ import {
   Schedule as ScheduleIcon,
 } from '@mui/icons-material'
 
-interface Project {
-  id: string
-  name: string
-  description: string
-  status: 'completed' | 'training' | 'pending' | 'failed'
-  createdAt: string
-  lastModified: string
-  problemType: 'classification' | 'regression' | 'clustering'
-  dataset: {
-    rows: number
-    columns: number
-    size: string
-  }
-  results?: {
-    bestModel: string
-    accuracy: number
-    auc?: number
-    f1Score?: number
-  }
-}
+// Project interface is now imported from services/api
 
 const ProjectsPage: React.FC = () => {
   const navigate = useNavigate()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const [selectedProject, setSelectedProject] = useState<string | null>(null)
+  const [selectedProject, setSelectedProject] = useState<number | null>(null)
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [projects, setProjects] = useState<Project[]>([])
+  const [creating, setCreating] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [newProject, setNewProject] = useState({
     name: '',
     description: '',
     problemType: 'classification' as const,
   })
 
-  // Mock projects data
-  const [projects] = useState<Project[]>([
-    {
-      id: '1',
-      name: 'Heart Disease Prediction',
-      description: 'Predicting heart disease using patient data',
-      status: 'completed',
-      createdAt: '2024-01-15',
-      lastModified: '2024-01-20',
-      problemType: 'classification',
-      dataset: { rows: 1024, columns: 13, size: '2.1 MB' },
-      results: {
-        bestModel: 'Random Forest',
-        accuracy: 0.89,
-        auc: 0.92,
-        f1Score: 0.88,
-      },
-    },
-    {
-      id: '2',
-      name: 'House Price Prediction',
-      description: 'Predicting house prices based on features',
-      status: 'training',
-      createdAt: '2024-01-18',
-      lastModified: '2024-01-22',
-      problemType: 'regression',
-      dataset: { rows: 2000, columns: 8, size: '4.5 MB' },
-    },
-    {
-      id: '3',
-      name: 'Customer Segmentation',
-      description: 'Grouping customers based on behavior',
-      status: 'pending',
-      createdAt: '2024-01-20',
-      lastModified: '2024-01-20',
-      problemType: 'clustering',
-      dataset: { rows: 5000, columns: 12, size: '8.2 MB' },
-    },
-  ])
+  // Load projects on component mount
+  useEffect(() => {
+    loadProjects()
+  }, [])
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, projectId: string) => {
+  const loadProjects = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      const response = await projectApi.getProjects()
+      setProjects(response.data.workflows)
+    } catch (error) {
+      console.error('Error loading projects:', error)
+      setError('Failed to load projects. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, projectId: number) => {
     setAnchorEl(event.currentTarget)
     setSelectedProject(projectId)
   }
@@ -121,41 +87,36 @@ const ProjectsPage: React.FC = () => {
     setSelectedProject(null)
   }
 
-  const handleCreateProject = () => {
-    // In a real app, this would create a new project
-    console.log('Creating project:', newProject)
-    setCreateDialogOpen(false)
-    setNewProject({ name: '', description: '', problemType: 'classification' })
-  }
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return 'success'
-      case 'training':
-        return 'warning'
-      case 'pending':
-        return 'info'
-      case 'failed':
-        return 'error'
-      default:
-        return 'default'
+  const handleCreateProject = async () => {
+    try {
+      setCreating(true)
+      setError(null)
+      const response = await projectApi.createProject({
+        name: newProject.name,
+        description: newProject.description,
+        problem_type: newProject.problemType,
+      })
+      
+      // Add the new project to the list
+      setProjects(prev => [response.data, ...prev])
+      setCreateDialogOpen(false)
+      setNewProject({ name: '', description: '', problemType: 'classification' })
+    } catch (error) {
+      console.error('Error creating project:', error)
+      setError('Failed to create project. Please try again.')
+    } finally {
+      setCreating(false)
     }
   }
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return <TrendingUpIcon />
-      case 'training':
-        return <PlayIcon />
-      case 'pending':
-        return <ScheduleIcon />
-      case 'failed':
-        return <DeleteIcon />
-      default:
-        return <FolderIcon />
-    }
+  const getStatusColor = () => {
+    // Since we don't have status in the API yet, we'll use a default
+    return 'info'
+  }
+
+  const getStatusIcon = () => {
+    // Since we don't have status in the API yet, we'll use a default
+    return <FolderIcon />
   }
 
   return (
@@ -182,98 +143,102 @@ const ProjectsPage: React.FC = () => {
           </Button>
         </Box>
 
+        {/* Error Display */}
+        {error && (
+          <Box sx={{ mb: 3 }}>
+            <Alert severity="error" onClose={() => setError(null)}>
+              {error}
+            </Alert>
+          </Box>
+        )}
+
         {/* Projects Grid */}
-        <Grid container spacing={3}>
-          {projects.map((project) => (
-            <Grid item xs={12} sm={6} md={4} key={project.id}>
-              <Card
-                sx={{
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: 4,
-                  },
-                  cursor: 'pointer',
-                }}
-                onClick={() => navigate(`/workflow/${project.id}`)}
-              >
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Avatar sx={{ bgcolor: 'primary.main', width: 32, height: 32 }}>
-                        {getStatusIcon(project.status)}
-                      </Avatar>
-                      <Chip
-                        label={project.status}
-                        color={getStatusColor(project.status) as any}
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+            <Typography>Loading projects...</Typography>
+          </Box>
+        ) : (
+          <Grid container spacing={3}>
+            {projects.map((project) => (
+              <Grid item xs={12} sm={6} md={4} key={project.id}>
+                <Card
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      boxShadow: 4,
+                    },
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => navigate(`/workflow/${project.id}`)}
+                >
+                  <CardContent sx={{ flexGrow: 1 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Avatar sx={{ bgcolor: 'primary.main', width: 32, height: 32 }}>
+                          {getStatusIcon()}
+                        </Avatar>
+                        <Chip
+                          label="New"
+                          color={getStatusColor() as any}
+                          size="small"
+                        />
+                      </Box>
+                      <IconButton
                         size="small"
-                      />
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleMenuOpen(e, project.id)
+                        }}
+                      >
+                        <MoreVertIcon />
+                      </IconButton>
                     </Box>
-                    <IconButton
-                      size="small"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleMenuOpen(e, project.id)
-                      }}
-                    >
-                      <MoreVertIcon />
-                    </IconButton>
-                  </Box>
 
-                  <Typography variant="h6" component="h3" gutterBottom sx={{ fontWeight: 600 }}>
-                    {project.name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    {project.description}
-                  </Typography>
+                    <Typography variant="h6" component="h3" gutterBottom sx={{ fontWeight: 600 }}>
+                      {project.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                      {project.description || 'No description provided'}
+                    </Typography>
 
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 2 }}>
-                    <Typography variant="caption" color="text.secondary">
-                      Problem Type: {project.problemType.charAt(0).toUpperCase() + project.problemType.slice(1)}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Dataset: {project.dataset.rows.toLocaleString()} rows × {project.dataset.columns} columns
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Size: {project.dataset.size}
-                    </Typography>
-                  </Box>
-
-                  {project.results && (
-                    <Paper sx={{ p: 2, bgcolor: 'success.50', border: '1px solid', borderColor: 'success.200' }}>
-                      <Typography variant="caption" color="success.dark" sx={{ fontWeight: 600 }}>
-                        Best Model: {project.results.bestModel}
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 2 }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Problem Type: {project.problem_type.charAt(0).toUpperCase() + project.problem_type.slice(1)}
                       </Typography>
-                      <Typography variant="h6" color="success.dark" sx={{ fontWeight: 600 }}>
-                        {(project.results.accuracy * 100).toFixed(1)}% Accuracy
+                      <Typography variant="caption" color="text.secondary">
+                        Created: {new Date(project.created_at).toLocaleDateString()}
                       </Typography>
-                    </Paper>
-                  )}
-                </CardContent>
+                      <Typography variant="caption" color="text.secondary">
+                        ID: {project.unique_id}
+                      </Typography>
+                    </Box>
+                  </CardContent>
 
-                <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
-                  <Typography variant="caption" color="text.secondary">
-                    Modified: {new Date(project.lastModified).toLocaleDateString()}
-                  </Typography>
-                  <Box>
-                    <IconButton size="small" onClick={(e) => e.stopPropagation()}>
-                      <PlayIcon />
-                    </IconButton>
-                    <IconButton size="small" onClick={(e) => e.stopPropagation()}>
-                      <DownloadIcon />
-                    </IconButton>
-                    <IconButton size="small" onClick={(e) => e.stopPropagation()}>
-                      <ShareIcon />
-                    </IconButton>
-                  </Box>
-                </CardActions>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+                  <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
+                    <Typography variant="caption" color="text.secondary">
+                      Modified: {new Date(project.updated_at).toLocaleDateString()}
+                    </Typography>
+                    <Box>
+                      <IconButton size="small" onClick={(e) => e.stopPropagation()}>
+                        <PlayIcon />
+                      </IconButton>
+                      <IconButton size="small" onClick={(e) => e.stopPropagation()}>
+                        <DownloadIcon />
+                      </IconButton>
+                      <IconButton size="small" onClick={(e) => e.stopPropagation()}>
+                        <ShareIcon />
+                      </IconButton>
+                    </Box>
+                  </CardActions>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        )}
 
         {/* Context Menu */}
         <Menu
@@ -338,9 +303,15 @@ const ProjectsPage: React.FC = () => {
             </FormControl>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setCreateDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleCreateProject} variant="contained">
-              Create Project
+            <Button onClick={() => setCreateDialogOpen(false)} disabled={creating}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleCreateProject} 
+              variant="contained" 
+              disabled={creating || !newProject.name}
+            >
+              {creating ? 'Creating...' : 'Create Project'}
             </Button>
           </DialogActions>
         </Dialog>

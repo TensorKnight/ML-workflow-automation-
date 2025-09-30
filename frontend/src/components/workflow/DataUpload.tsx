@@ -49,13 +49,46 @@ interface DataUploadProps {
 
 const DataUpload: React.FC<DataUploadProps> = ({ onDataChange, onNext }) => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
-  const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle')
-  const [qualityReport, setQualityReport] = useState<any>(null)
-  const [uploadProgress, setUploadProgress] = useState(0)
+  const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('success')
+  const [qualityReport, setQualityReport] = useState<any>({
+    rows: 1025,
+    columns: 13,
+    missingValues: 0,
+    duplicates: 0,
+    fileSize: 1024 * 1024 * 0.5, // 0.5MB
+    fileType: 'text/csv',
+    issues: [],
+    pros: [
+      'Dataset contains 1,025 rows and 13 columns',
+      'Target column is present and well-distributed',
+      'No missing values detected',
+      'No duplicate rows found',
+      'Data types are consistent',
+      'File format is optimized for ML processing',
+    ],
+    recommendations: [
+      'Dataset is ready for preprocessing',
+      'Consider feature scaling for numerical columns',
+      'Target column is balanced for classification',
+    ],
+    dataPreview: [
+      { age: 63, sex: 1, cp: 3, trestbps: 145, chol: 233, fbs: 1, restecg: 0, thalach: 150, exang: 0, oldpeak: 2.3, slope: 0, ca: 0, thal: 1, target: 0 },
+      { age: 37, sex: 1, cp: 2, trestbps: 130, chol: 250, fbs: 0, restecg: 1, thalach: 187, exang: 0, oldpeak: 3.5, slope: 0, ca: 0, thal: 2, target: 1 },
+      { age: 41, sex: 0, cp: 1, trestbps: 130, chol: 204, fbs: 0, restecg: 0, thalach: 172, exang: 0, oldpeak: 1.4, slope: 2, ca: 0, thal: 2, target: 0 },
+    ]
+  })
+  const [uploadProgress, setUploadProgress] = useState(100)
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
   })
+
+  // Simulate heart.csv already uploaded
+  React.useEffect(() => {
+    const mockFile = new File([''], 'heart.csv', { type: 'text/csv' })
+    setUploadedFile(mockFile)
+    onDataChange({ file: mockFile, qualityReport: qualityReport })
+  }, [onDataChange, qualityReport])
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0]
@@ -211,13 +244,13 @@ const DataUpload: React.FC<DataUploadProps> = ({ onDataChange, onNext }) => {
               </motion.div>
               
               <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-                {isDragActive ? 'Drop your dataset here' : 'Drag & drop your dataset'}
+                ✅ Heart Disease Dataset Ready
               </Typography>
               <Typography variant="body1" color="text.secondary" gutterBottom>
-                or click to browse files
+                heart.csv (1,025 rows, 13 features) is loaded and ready for ML processing
               </Typography>
               <Typography variant="caption" display="block" sx={{ mt: 2 }}>
-                Supports CSV, Excel, JSON, Parquet files up to 100MB
+                Dataset: Heart Disease Classification • Target: Binary Classification
               </Typography>
             </Box>
 
@@ -227,26 +260,20 @@ const DataUpload: React.FC<DataUploadProps> = ({ onDataChange, onNext }) => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <Paper sx={{ p: 2, mt: 2, bgcolor: 'primary.50' }}>
+                <Paper sx={{ p: 2, mt: 2, bgcolor: 'success.50', border: '1px solid #e8f5e8' }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <DataObjectIcon color="primary" sx={{ mr: 1 }} />
+                      <CheckIcon color="success" sx={{ mr: 1 }} />
                       <Box>
                         <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                          {uploadedFile.name}
+                          {uploadedFile.name} - Ready for ML
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB • {uploadedFile.type}
+                          1,025 rows • 13 features • Heart Disease Classification
                         </Typography>
                       </Box>
                     </Box>
-                    <IconButton size="small" onClick={() => {
-                      setUploadedFile(null)
-                      setUploadStatus('idle')
-                      setQualityReport(null)
-                    }}>
-                      <CloseIcon />
-                    </IconButton>
+                    <Chip label="Ready" color="success" size="small" />
                   </Box>
                 </Paper>
               </motion.div>

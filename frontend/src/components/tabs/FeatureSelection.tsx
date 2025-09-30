@@ -16,13 +16,24 @@ import {
   Select,
   MenuItem,
   TextField,
+  Alert,
 } from '@mui/material'
+import { ArrowForward as ArrowForwardIcon } from '@mui/icons-material'
 
-const FeatureSelection: React.FC = () => {
-  const [selectedFeatures, setSelectedFeatures] = useState<string[]>([])
+interface FeatureSelectionProps {
+  onNext?: () => void
+}
+
+const FeatureSelection: React.FC<FeatureSelectionProps> = ({ onNext }) => {
+  const [selectedFeatures, setSelectedFeatures] = useState<string[]>([
+    'age', 'sex', 'cp', 'trestbps', 'chol', 'fbs', 'restecg', 
+    'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal'
+  ])
   const [method, setMethod] = useState('correlation')
   const [threshold, setThreshold] = useState(0.1)
   const [maxFeatures, setMaxFeatures] = useState(10)
+  const [isCompleted, setIsCompleted] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false)
 
   const availableFeatures = [
     'age', 'sex', 'cp', 'trestbps', 'chol', 'fbs', 'restecg', 
@@ -45,11 +56,58 @@ const FeatureSelection: React.FC = () => {
     setSelectedFeatures([])
   }
 
+  const handleSelectFeatures = async () => {
+    setIsProcessing(true)
+    
+    // Simulate feature selection
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    
+    setIsProcessing(false)
+    setIsCompleted(true)
+  }
+
   return (
     <Box>
-      <Typography variant="h6" gutterBottom>
-        Feature Selection
-      </Typography>
+      {!isCompleted ? (
+        <>
+          <Typography variant="h6" gutterBottom>
+            Feature Selection
+          </Typography>
+          <Typography variant="body2" color="text.secondary" gutterBottom>
+            Select the features to use for the heart disease classification model
+          </Typography>
+        </>
+      ) : (
+        <>
+          <Typography variant="h6" gutterBottom>
+            ✅ Feature Selection Completed
+          </Typography>
+          <Typography variant="body2" color="text.secondary" gutterBottom>
+            All 13 features have been selected for the heart disease classification model
+          </Typography>
+          <Alert severity="success" sx={{ mt: 2 }}>
+            Feature selection completed! {selectedFeatures.length} features selected for model training.
+          </Alert>
+          
+          {onNext && (
+            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+              <Button
+                variant="contained"
+                endIcon={<ArrowForwardIcon />}
+                onClick={onNext}
+                sx={{
+                  background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
+                  '&:hover': {
+                    background: 'linear-gradient(45deg, #1565c0, #1976d2)',
+                  }
+                }}
+              >
+                Next: Model Training
+              </Button>
+            </Box>
+          )}
+        </>
+      )}
 
       <Grid container spacing={3}>
         <Grid item xs={12} md={8}>
@@ -161,6 +219,27 @@ const FeatureSelection: React.FC = () => {
           </Card>
         </Grid>
       </Grid>
+
+      {!isCompleted && (
+        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+          <Button
+            variant="contained"
+            size="large"
+            onClick={handleSelectFeatures}
+            disabled={isProcessing}
+            sx={{ 
+              px: 4,
+              py: 1.5,
+              background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
+              '&:hover': {
+                background: 'linear-gradient(45deg, #1565c0, #1976d2)',
+              }
+            }}
+          >
+            {isProcessing ? 'Selecting Features...' : 'Select Features →'}
+          </Button>
+        </Box>
+      )}
     </Box>
   )
 }

@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import {
   Box,
   Container,
   Typography,
   Button,
   Grid,
-  Card,
-  CardContent,
-  CardActions,
   Paper,
-  Avatar,
-  Chip,
   Stack,
   Divider,
   useTheme,
@@ -26,13 +22,9 @@ import {
   Timeline as TimelineIcon,
   ArrowForward as ArrowForwardIcon,
   CheckCircle as CheckCircleIcon,
-  Security as SecurityIcon,
-  Support as SupportIcon,
   TrendingUp as TrendingUpIcon,
   Code as CodeIcon,
-  Dashboard as DashboardIcon,
   School as SchoolIcon,
-  Star as StarIcon,
   People as PeopleIcon,
   Business as BusinessIcon,
   Description as DescriptionIcon,
@@ -84,12 +76,6 @@ const LandingPage: React.FC = () => {
     'Easy deployment',
   ]
 
-  const stats = [
-    { number: '10K+', label: 'Active Users' },
-    { number: '50K+', label: 'Models Trained' },
-    { number: '99.9%', label: 'Uptime' },
-    { number: '24/7', label: 'Support' },
-  ]
 
   const testimonials = [
     {
@@ -144,7 +130,9 @@ const LandingPage: React.FC = () => {
           // Add staggered animation for multiple elements
           const delay = Array.from(entry.target.parentNode?.children || []).indexOf(entry.target) * 100
           setTimeout(() => {
-            entry.target.style.animationDelay = `${delay}ms`
+            if (entry.target instanceof HTMLElement) {
+              entry.target.style.animationDelay = `${delay}ms`
+            }
           }, 0)
         }
       })
@@ -179,16 +167,21 @@ const LandingPage: React.FC = () => {
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
       {/* Hero Section */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+      >
       <Box
         sx={{
           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
           color: 'white',
-          py: { xs: 8, md: 12 },
+            py: { xs: 8, md: 12 },
           position: 'relative',
           overflow: 'hidden',
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
+            minHeight: '100vh',
+            display: 'flex',
+            alignItems: 'center',
           '&::before': {
             content: '""',
             position: 'absolute',
@@ -225,26 +218,36 @@ const LandingPage: React.FC = () => {
         }}
       >
         {/* Enhanced Floating Icons */}
-        <Box sx={{
-          position: 'absolute',
-          top: '20%',
-          right: '10%',
-          animation: 'float 3s ease-in-out infinite, pulse 2s ease-in-out infinite',
-          zIndex: 0,
-          '& svg': {
-            fontSize: 40,
-            color: 'rgba(255, 255, 255, 0.2)',
-            filter: 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.3))',
-            transition: 'all 0.3s ease-in-out',
-          },
-          '&:hover svg': {
-            color: 'rgba(255, 255, 255, 0.4)',
-            transform: 'scale(1.1)',
-            filter: 'drop-shadow(0 0 15px rgba(255, 255, 255, 0.5))',
-          }
-        }}>
-          <AnalyticsIcon />
-        </Box>
+        <motion.div
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ 
+            opacity: [0.2, 0.4, 0.2],
+            scale: [1, 1.1, 1],
+            y: [0, -10, 0]
+          }}
+          transition={{ 
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          style={{
+            position: 'absolute',
+            top: '20%',
+            right: '10%',
+            zIndex: 0,
+          }}
+        >
+          <Box sx={{
+            '& svg': {
+              fontSize: 40,
+              color: 'rgba(255, 255, 255, 0.2)',
+              filter: 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.3))',
+              transition: 'all 0.3s ease-in-out',
+            },
+          }}>
+            <AnalyticsIcon />
+          </Box>
+        </motion.div>
         
         <Box sx={{
           position: 'absolute',
@@ -288,33 +291,49 @@ const LandingPage: React.FC = () => {
           <CodeIcon />
         </Box>
 
-        <Box sx={{
-          position: 'absolute',
-          top: '40%',
-          left: '5%',
-          animation: 'float 6s ease-in-out infinite reverse, pulse 4s ease-in-out infinite',
-          zIndex: 0,
-          '& svg': {
-            fontSize: 25,
-            color: 'rgba(255, 255, 255, 0.08)',
-            filter: 'drop-shadow(0 0 5px rgba(255, 255, 255, 0.1))',
-            transition: 'all 0.3s ease-in-out',
-          },
-          '&:hover svg': {
-            color: 'rgba(255, 255, 255, 0.2)',
-            transform: 'scale(1.1)',
-            filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.25))',
-          }
-        }}>
-          <SpeedIcon />
-        </Box>
+        <motion.div
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ 
+            opacity: [0.08, 0.2, 0.08],
+            scale: [1, 1.1, 1],
+            y: [0, -20, 0]
+          }}
+          transition={{ 
+            duration: 6,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 2
+          }}
+          style={{
+            position: 'absolute',
+            top: '40%',
+            left: '5%',
+            zIndex: 0,
+          }}
+        >
+          <Box sx={{
+            '& svg': {
+              fontSize: 25,
+              color: 'rgba(255, 255, 255, 0.08)',
+              filter: 'drop-shadow(0 0 5px rgba(255, 255, 255, 0.1))',
+              transition: 'all 0.3s ease-in-out',
+            },
+          }}>
+            <SpeedIcon />
+          </Box>
+        </motion.div>
 
         <Container maxWidth="lg">
           <Grid container spacing={4} alignItems="center">
             <Grid item xs={12} md={6}>
               <Box sx={{ position: 'relative', zIndex: 1 }}>
+                <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
+                >
               <Typography
-                  variant={isMobile ? 'h3' : 'h2'}
+                    variant={isMobile ? 'h3' : 'h2'}
                 component="h1"
                 gutterBottom
                 sx={{
@@ -323,22 +342,34 @@ const LandingPage: React.FC = () => {
                   backgroundClip: 'text',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
-                    mb: 2,
+                      mb: 2,
                 }}
               >
-                ML Workflow
+                OctaML
                 <br />
-                Automation
+                
               </Typography>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+                >
               <Typography
-                  variant={isMobile ? 'h6' : 'h5'}
-                  sx={{ mb: 4, opacity: 0.9, fontWeight: 300, lineHeight: 1.6 }}
+                    variant={isMobile ? 'h6' : 'h5'}
+                    sx={{ mb: 4, opacity: 0.9, fontWeight: 300, lineHeight: 1.6 }}
               >
-                Build, train, and deploy machine learning models with ease.
-                  <br />
-                  <strong>No coding required.</strong>
+                Build, train, and deploy machine learning models in minutes.
+                    <br />
+                    <strong>No coding required.</strong>
               </Typography>
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 4 }}>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+                >
+                  <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 4 }}>
                 <Button
                   variant="contained"
                   size="large"
@@ -365,33 +396,8 @@ const LandingPage: React.FC = () => {
                     Get Started Free
                     <ArrowForwardIcon sx={{ ml: 1, transition: 'transform 0.3s ease-in-out' }} />
                 </Button>
-                <Button
-                  variant="outlined"
-                  size="large"
-                  sx={{
-                    borderColor: 'white',
-                    color: 'white',
-                    px: 4,
-                    py: 1.5,
-                    fontWeight: 600,
-                    borderRadius: 3,
-                    borderWidth: 2,
-                    backdropFilter: 'blur(10px)',
-                    '&:hover': {
-                      borderColor: 'white',
-                      bgcolor: 'rgba(255,255,255,0.15)',
-                      transform: 'translateY(-3px) scale(1.02)',
-                      boxShadow: '0 8px 30px rgba(255, 255, 255, 0.2)',
-                    },
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    '&:active': {
-                      transform: 'translateY(-1px) scale(0.98)',
-                    }
-                  }}
-                >
-                  Watch Demo
-                </Button>
-                </Stack>
+                  </Stack>
+                </motion.div>
               </Box>
             </Grid>
             <Grid item xs={12} md={6}>
@@ -404,23 +410,46 @@ const LandingPage: React.FC = () => {
                   position: 'relative',
                 }}
               >
-                <Box
-                  sx={{
-                    position: 'relative',
-                    animation: 'float 6s ease-in-out infinite',
-                    '@keyframes float': {
-                      '0%, 100%': { transform: 'translateY(0px)' },
-                      '50%': { transform: 'translateY(-20px)' },
-                    },
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.5 }}
+                  animate={{ 
+                    opacity: 1, 
+                    scale: 1,
+                    y: [0, -20, 0]
+                  }}
+                  transition={{ 
+                    duration: 2,
+                    ease: "easeOut",
+                    y: {
+                      duration: 6,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }
+                  }}
+                  whileHover={{ 
+                    scale: 1.1,
+                    rotate: 10,
+                    transition: { duration: 0.3 }
                   }}
                 >
-                  <AutoAwesomeIcon sx={{ fontSize: { xs: 150, md: 200 }, opacity: 0.8 }} />
-                </Box>
+                  <Box
+                    sx={{
+                      position: 'relative',
+                      '& svg': {
+                        filter: 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.3))',
+                        transition: 'all 0.3s ease-in-out',
+                      },
+                    }}
+                  >
+                    <AutoAwesomeIcon sx={{ fontSize: { xs: 150, md: 200 }, opacity: 0.8 }} />
+                  </Box>
+                </motion.div>
               </Box>
             </Grid>
           </Grid>
         </Container>
-      </Box>
+        </Box>
+      </motion.div>
 
       {/* Full Width Quote Section */}
       <Box sx={{ 
@@ -429,20 +458,61 @@ const LandingPage: React.FC = () => {
         textAlign: 'center',
       }}>
         <Container maxWidth="md">
-          <Typography variant="h3" component="h2" sx={{ 
-            fontWeight: 700, 
-            mb: 2,
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            letterSpacing: '-0.02em',
-            lineHeight: 1.2,
-            textShadow: '0 0 30px rgba(102, 126, 234, 0.3)',
-            fontStyle: 'italic',
-          }}>
-            Machine learning made effortless
-          </Typography>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            <Box sx={{ position: 'relative' }}>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
+                viewport={{ once: true }}
+              >
+                <Typography 
+                  variant="h1" 
+                  sx={{ 
+                    position: 'absolute',
+                    top: -20,
+                    left: -10,
+                    fontSize: '4rem',
+                    color: 'rgba(102, 126, 234, 0.2)',
+                    fontFamily: 'serif',
+                    lineHeight: 1,
+                    zIndex: 0,
+                  }}
+                >
+                  "
+                </Typography>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+                viewport={{ once: true }}
+              >
+                <Typography variant="h3" component="h2" sx={{ 
+                  fontWeight: 700, 
+                  mb: 2,
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1.2,
+                  textShadow: '0 0 30px rgba(102, 126, 234, 0.3)',
+                  fontStyle: 'italic',
+                  position: 'relative',
+                  zIndex: 1,
+                  pl: 2,
+                }}>
+                  Machine Learning model in Seconds
+                </Typography>
+              </motion.div>
+            </Box>
+          </motion.div>
         </Container>
       </Box>
 
@@ -486,7 +556,13 @@ const LandingPage: React.FC = () => {
           }
         }
       }}>
-        <Box sx={{ textAlign: 'center', mb: 6 }} className="fade-in">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          viewport={{ once: true, margin: "-100px" }}
+        >
+        <Box sx={{ textAlign: 'center', mb: 6 }}>
           <Typography variant="h3" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
             Powerful Features
           </Typography>
@@ -495,6 +571,7 @@ const LandingPage: React.FC = () => {
             in a single, intuitive platform.
           </Typography>
         </Box>
+        </motion.div>
 
         <Box sx={{ 
           display: 'flex', 
@@ -508,6 +585,22 @@ const LandingPage: React.FC = () => {
           }
         }}>
           {features.map((feature, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 50, scale: 0.8 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ 
+                duration: 0.6, 
+                delay: index * 0.1, 
+                ease: "easeOut" 
+              }}
+              viewport={{ once: true, margin: "-50px" }}
+              whileHover={{ 
+                y: -8, 
+                scale: 1.02,
+                transition: { duration: 0.2 }
+              }}
+            >
             <Box
               key={index}
                 sx={{
@@ -530,18 +623,6 @@ const LandingPage: React.FC = () => {
                   transform: { md: 'translateX(-50px)' },
                 },
                 transition: 'all 0.3s ease-in-out',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  '&:nth-of-type(odd)': {
-                    transform: { sm: 'translateY(16px)' },
-                  },
-                  '&:nth-of-type(3n)': {
-                    transform: { md: 'translateX(50px) translateY(-4px)' },
-                  },
-                  '&:nth-of-type(3n+1)': {
-                    transform: { md: 'translateX(-50px) translateY(-4px)' },
-                  },
-                },
               }}
             >
               <Box sx={{ 
@@ -564,6 +645,7 @@ const LandingPage: React.FC = () => {
                 {feature.description}
               </Typography>
             </Box>
+            </motion.div>
           ))}
         </Box>
       </Container>
@@ -575,64 +657,337 @@ const LandingPage: React.FC = () => {
         textAlign: 'center',
       }}>
         <Container maxWidth="md">
-          <Typography variant="h3" component="h2" sx={{ 
-            fontWeight: 700, 
-            mb: 2,
-            background: 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            letterSpacing: '-0.02em',
-            lineHeight: 1.2,
-            textShadow: '0 0 30px rgba(118, 75, 162, 0.3)',
-            fontStyle: 'italic',
-          }}>
-            From data to deployment — just a few clicks away.
-          </Typography>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            <Box sx={{ position: 'relative' }}>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
+                viewport={{ once: true }}
+              >
+                <Typography 
+                  variant="h1" 
+                  sx={{ 
+                    position: 'absolute',
+                    top: -20,
+                    left: -10,
+                    fontSize: '4rem',
+                    color: 'rgba(118, 75, 162, 0.2)',
+                    fontFamily: 'serif',
+                    lineHeight: 1,
+                    zIndex: 0,
+                  }}
+                >
+                  "
+                </Typography>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+                viewport={{ once: true }}
+              >
+                <Typography variant="h3" component="h2" sx={{ 
+                  fontWeight: 700, 
+                  mb: 2,
+                  background: 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1.2,
+                  textShadow: '0 0 30px rgba(118, 75, 162, 0.3)',
+                  fontStyle: 'italic',
+                  position: 'relative',
+                  zIndex: 1,
+                  pl: 2,
+                }}>
+                  Made in Bharat. Made for the World.
+                </Typography>
+              </motion.div>
+            </Box>
+          </motion.div>
+        </Container>
+      </Box>
+
+      {/* Pipeline Workflow Section */}
+      <Box sx={{ bgcolor: 'background.default', py: 8 }}>
+        <Container maxWidth="lg">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            <Box sx={{ textAlign: 'center', mb: 8 }}>
+              <Typography variant="h3" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
+                Your ML Pipeline Journey
+              </Typography>
+              <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
+                From raw data to production-ready models in just a few simple steps
+              </Typography>
+            </Box>
+          </motion.div>
+
+          {/* Workflow Steps */}
+          <Box sx={{ position: 'relative' }}>
+            {/* Connection Lines */}
+            <Box sx={{
+              position: 'absolute',
+              top: '50%',
+              left: 0,
+              right: 0,
+              height: '2px',
+              background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+              zIndex: 0,
+              display: { xs: 'none', md: 'block' }
+            }} />
+
+            <Grid container spacing={4}>
+              {[
+                {
+                  step: 1,
+                  title: 'Data Upload',
+                  description: 'Upload datasets in any format',
+                  icon: <CloudUploadIcon sx={{ fontSize: 40, color: 'primary.main' }} />,
+                  color: 'primary.main'
+                },
+                {
+                  step: 2,
+                  title: 'Smart Preprocessing',
+                  description: 'AI automatically cleans and transforms data',
+                  icon: <AnalyticsIcon sx={{ fontSize: 40, color: 'secondary.main' }} />,
+                  color: 'secondary.main'
+                },
+                {
+                  step: 3,
+                  title: 'Feature Engineering',
+                  description: 'Create meaningful features automatically',
+                  icon: <PsychologyIcon sx={{ fontSize: 40, color: 'success.main' }} />,
+                  color: 'success.main'
+                },
+                {
+                  step: 4,
+                  title: 'Model Training',
+                  description: 'Train and select the best model',
+                  icon: <TimelineIcon sx={{ fontSize: 40, color: 'warning.main' }} />,
+                  color: 'warning.main'
+                },
+                {
+                  step: 5,
+                  title: 'Validation & Testing',
+                  description: 'Comprehensive model evaluation',
+                  icon: <CheckCircleIcon sx={{ fontSize: 40, color: 'info.main' }} />,
+                  color: 'info.main'
+                },
+                {
+                  step: 6,
+                  title: 'Deployment',
+                  description: 'One-click production deployment',
+                  icon: <CodeIcon sx={{ fontSize: 40, color: 'error.main' }} />,
+                  color: 'error.main'
+                }
+              ].map((step, index) => (
+                <Grid item xs={12} md={2} key={index}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 50, scale: 0.8 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ 
+                      duration: 0.6, 
+                      delay: index * 0.2, 
+                      ease: "easeOut" 
+                    }}
+                    viewport={{ once: true, margin: "-50px" }}
+                  >
+                    <Box sx={{ 
+                      textAlign: 'center',
+                      position: 'relative',
+                      zIndex: 1,
+                      p: 3,
+                      borderRadius: 3,
+                      bgcolor: 'background.paper',
+                      boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                    }}>
+                      {/* Step Number */}
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        whileInView={{ scale: 1 }}
+                        transition={{ duration: 0.5, delay: index * 0.2 + 0.3 }}
+                        viewport={{ once: true }}
+                      >
+                        <Box sx={{
+                          width: 60,
+                          height: 60,
+                          borderRadius: '50%',
+                          bgcolor: step.color,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          mx: 'auto',
+                          mb: 2,
+                          boxShadow: `0 4px 15px ${step.color}40`
+                        }}>
+                          <Typography variant="h6" sx={{ color: 'white', fontWeight: 700 }}>
+                            {step.step}
+                          </Typography>
+                        </Box>
+                      </motion.div>
+
+                      {/* Icon */}
+                      <motion.div
+                        initial={{ scale: 0, rotate: -180 }}
+                        whileInView={{ scale: 1, rotate: 0 }}
+                        transition={{ duration: 0.6, delay: index * 0.2 + 0.4 }}
+                        viewport={{ once: true }}
+                      >
+                        <Box sx={{ mb: 2 }}>
+                          {step.icon}
+                        </Box>
+                      </motion.div>
+
+                      {/* Content */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: index * 0.2 + 0.5 }}
+                        viewport={{ once: true }}
+                      >
+                        <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, color: 'text.primary' }}>
+                          {step.title}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.5 }}>
+                          {step.description}
+                        </Typography>
+                      </motion.div>
+                    </Box>
+                  </motion.div>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+
+          {/* Bottom CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
+            viewport={{ once: true }}
+          >
+            <Box sx={{ textAlign: 'center', mt: 8 }}>
+              <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
+                Ready to Start Your ML Journey?
+              </Typography>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button
+                  variant="contained"
+                  size="large"
+                  sx={{
+                    bgcolor: 'primary.main',
+                    px: 6,
+                    py: 2,
+                    fontWeight: 600,
+                    borderRadius: 3,
+                    boxShadow: '0 4px 20px rgba(102, 126, 234, 0.3)',
+                    '&:hover': {
+                      bgcolor: 'primary.dark',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 8px 30px rgba(102, 126, 234, 0.4)',
+                    },
+                    transition: 'all 0.3s ease-in-out',
+                  }}
+                  onClick={() => navigate('/projects')}
+                >
+                  Start Building Your Pipeline
+                  <ArrowForwardIcon sx={{ ml: 1 }} />
+                </Button>
+              </motion.div>
+            </Box>
+          </motion.div>
         </Container>
       </Box>
 
       {/* Use Cases Section */}
       <Box sx={{ bgcolor: 'grey.50', py: 8 }}>
         <Container maxWidth="lg">
-          <Box sx={{ textAlign: 'center', mb: 6 }} className="fade-in">
-            <Typography variant="h3" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
-              Perfect For
-            </Typography>
-            <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
-              Whether you're a data scientist, business analyst, or developer,
-              our platform adapts to your needs.
-            </Typography>
-          </Box>
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            <Box sx={{ textAlign: 'center', mb: 6 }}>
+              <Typography variant="h3" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
+                Perfect For
+              </Typography>
+              <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
+                Whether you're a data scientist, business analyst, or developer,
+                our platform adapts to your needs.
+              </Typography>
+            </Box>
+          </motion.div>
 
           <Grid container spacing={4}>
             {useCases.map((useCase, index) => (
               <Grid item xs={12} md={4} key={index}>
-                <Paper
-                  sx={{
-                    p: 4,
-                    textAlign: 'center',
-                    height: '100%',
-                    transition: 'all 0.3s ease-in-out',
-                  '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: 4,
-                  },
-                }}
-              >
-                  <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
-                    {useCase.icon}
-                  </Box>
-                  <Typography variant="h6" component="h3" gutterBottom sx={{ fontWeight: 600 }}>
-                    {useCase.title}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
-                    {useCase.description}
-                  </Typography>
-                </Paper>
-            </Grid>
-          ))}
-        </Grid>
+                <motion.div
+                  initial={{ opacity: 0, y: 50, scale: 0.8 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ 
+                    duration: 0.6, 
+                    delay: index * 0.2, 
+                    ease: "easeOut" 
+                  }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  whileHover={{ 
+                    y: -8, 
+                    scale: 1.02,
+                    transition: { duration: 0.2 }
+                  }}
+                >
+                  <Paper
+                    sx={{
+                      p: 4,
+                      textAlign: 'center',
+                      height: '100%',
+                      transition: 'all 0.3s ease-in-out',
+                    }}
+                  >
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      whileInView={{ scale: 1 }}
+                      transition={{ duration: 0.5, delay: index * 0.2 + 0.3 }}
+                      viewport={{ once: true }}
+                    >
+                      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
+                        {useCase.icon}
+                      </Box>
+                    </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.2 + 0.5 }}
+                      viewport={{ once: true }}
+                    >
+                      <Typography variant="h6" component="h3" gutterBottom sx={{ fontWeight: 600 }}>
+                        {useCase.title}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
+                        {useCase.description}
+                      </Typography>
+                    </motion.div>
+                  </Paper>
+                </motion.div>
+              </Grid>
+            ))}
+          </Grid>
       </Container>
       </Box>
 
@@ -640,19 +995,32 @@ const LandingPage: React.FC = () => {
       <Box sx={{ bgcolor: 'grey.50', py: 8 }}>
         <Container maxWidth="lg">
           {/* Section Header */}
-          <Box sx={{ textAlign: 'center', mb: 6 }}>
-            <Typography variant="h3" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
-              What Our Users Say
-            </Typography>
-          </Box>
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            <Box sx={{ textAlign: 'center', mb: 6 }}>
+              <Typography variant="h3" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
+                What Our Users Say
+              </Typography>
+            </Box>
+          </motion.div>
 
           {/* Testimonial Content */}
-          <Box sx={{ 
-            maxWidth: 800, 
-            mx: 'auto',
-            position: 'relative',
-            minHeight: '200px'
-          }}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            <Box sx={{ 
+              maxWidth: 800, 
+              mx: 'auto',
+              position: 'relative',
+              minHeight: '200px'
+            }}>
             {/* Quote Container */}
             <Box sx={{
               position: 'relative',
@@ -702,7 +1070,8 @@ const LandingPage: React.FC = () => {
                 {testimonials[currentTestimonial].role} at {testimonials[currentTestimonial].company}
               </Typography>
             </Box>
-          </Box>
+            </Box>
+          </motion.div>
         </Container>
       </Box>
 
@@ -711,21 +1080,27 @@ const LandingPage: React.FC = () => {
         <Container maxWidth="lg">
           <Grid container spacing={6} alignItems="center">
             <Grid item xs={12} md={6}>
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                viewport={{ once: true, margin: "-100px" }}
+              >
               <Typography variant="h3" component="h2" gutterBottom sx={{ fontWeight: 600 }}>
-                  Why Choose {' '}
-                  <Box
-                    component="span"
-                    sx={{
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                      backgroundClip: 'text',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      fontWeight: 600,
-                    }}
-                  >
-                    OctoML
-                  </Box>
-                  ?
+                    Why Choose {' '}
+                    <Box
+                      component="span"
+                      sx={{
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        backgroundClip: 'text',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        fontWeight: 600,
+                      }}
+                    >
+                      OctoML
+                    </Box>
+                    ?
               </Typography>
               <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
                 Experience the future of machine learning with our automated
@@ -733,51 +1108,63 @@ const LandingPage: React.FC = () => {
               </Typography>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {benefits.map((benefit, index) => (
-                  <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
+                      viewport={{ once: true }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <CheckCircleIcon sx={{ color: 'success.main' }} />
                     <Typography variant="body1">{benefit}</Typography>
                   </Box>
+                    </motion.div>
                 ))}
               </Box>
+              </motion.div>
             </Grid>
             <Grid item xs={12} md={6}>
-              <Box sx={{ 
-                display: 'flex', 
-                flexDirection: 'column', 
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100%',
-                gap: 4, 
-                p: 3 
-              }}>
-                {/* Simple Stats */}
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="h2" sx={{ fontWeight: 700, color: 'primary.main', mb: 1 }}>
-                    10x
-                  </Typography>
-                  <Typography variant="h6" color="text.secondary">
-                    Faster than traditional workflows
-                  </Typography>
-                </Box>
-
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="h2" sx={{ fontWeight: 700, color: 'success.main', mb: 1 }}>
-                    99.9%
-                  </Typography>
-                  <Typography variant="h6" color="text.secondary">
-                    Uptime guarantee
-                  </Typography>
-                </Box>
-
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="h2" sx={{ fontWeight: 700, color: 'warning.main', mb: 1 }}>
-                    24/7
+              <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                viewport={{ once: true, margin: "-100px" }}
+              >
+                <Box sx={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '100%',
+                  gap: 4, 
+                  p: 3 
+                }}>
+                  {/* Simple Stats */}
+                  {[
+                    { value: "60-70%", label: "Reduction in model development time", color: "primary.main" },
+                    { value: "70-80%", label: "Reduction in model development time", color: "success.main" },
+                    { value: "15-20%", label: "Better accuracies", color: "warning.main" }
+                  ].map((stat, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.6, delay: index * 0.2, ease: "easeOut" }}
+                      viewport={{ once: true }}
+                    >
+                      <Box sx={{ textAlign: 'center' }}>
+                        <Typography variant="h2" sx={{ fontWeight: 700, color: stat.color, mb: 1 }}>
+                          {stat.value}
                 </Typography>
-                  <Typography variant="h6" color="text.secondary">
-                    Expert support available
+                        <Typography variant="h6" color="text.secondary">
+                          {stat.label}
                 </Typography>
+                      </Box>
+                    </motion.div>
+                  ))}
                 </Box>
-              </Box>
+              </motion.div>
             </Grid>
           </Grid>
         </Container>
@@ -815,73 +1202,103 @@ const LandingPage: React.FC = () => {
         }}
       >
         <Container maxWidth="md" sx={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
-          <Typography variant="h3" component="h2" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            <Typography variant="h3" component="h2" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
           Ready to Get Started?
         </Typography>
-          <Typography variant="h6" sx={{ mb: 4, opacity: 0.9, fontWeight: 300 }}>
+            <Typography variant="h6" sx={{ mb: 4, opacity: 0.9, fontWeight: 300 }}>
           Join thousands of data scientists and analysts who trust our platform
           for their machine learning needs.
         </Typography>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center">
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            viewport={{ once: true }}
+          >
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
         <Button
           variant="contained"
           size="large"
-              sx={{
-                bgcolor: 'white',
-                color: 'primary.main',
-                px: 6,
-                py: 2,
-                fontWeight: 600,
-                '&:hover': {
-                  bgcolor: 'grey.100',
-                  transform: 'translateY(-2px)',
-                },
-                transition: 'all 0.2s ease-in-out',
-              }}
+                      sx={{
+                        bgcolor: 'white',
+                        color: 'primary.main',
+                        px: 6,
+                        py: 2,
+                        fontWeight: 600,
+                        '&:hover': {
+                          bgcolor: 'grey.100',
+                          transform: 'translateY(-2px)',
+                        },
+                        transition: 'all 0.2s ease-in-out',
+                      }}
           onClick={() => navigate('/projects')}
         >
           Start Your First Project
           <ArrowForwardIcon sx={{ ml: 1 }} />
         </Button>
-            <Button
-              variant="outlined"
-              size="large"
-              sx={{
-                borderColor: 'white',
-                color: 'white',
-                px: 6,
-                py: 2,
-                fontWeight: 600,
-                '&:hover': {
-                  borderColor: 'white',
-                  bgcolor: 'rgba(255,255,255,0.1)',
-                  transform: 'translateY(-2px)',
-                },
-                transition: 'all 0.2s ease-in-out',
-              }}
-            >
-              Schedule Demo
-            </Button>
-          </Stack>
+              </motion.div>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button
+                  variant="outlined"
+                  size="large"
+                  sx={{
+                    borderColor: 'white',
+                    color: 'white',
+                    px: 6,
+                    py: 2,
+                    fontWeight: 600,
+                    '&:hover': {
+                      borderColor: 'white',
+                      bgcolor: 'rgba(255,255,255,0.1)',
+                      transform: 'translateY(-2px)',
+                    },
+                    transition: 'all 0.2s ease-in-out',
+                  }}
+                >
+                  Schedule Demo
+                </Button>
+              </motion.div>
+            </Stack>
+          </motion.div>
         </Container>
       </Box>
 
       {/* Footer */}
-      <Box sx={{ 
-        bgcolor: 'grey.900', 
-        color: 'white', 
-        py: 8,
-        position: 'relative',
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '1px',
-          background: 'linear-gradient(90deg, transparent 0%, rgba(102, 126, 234, 0.5) 50%, transparent 100%)',
-        }
-      }}>
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        viewport={{ once: true, margin: "-100px" }}
+      >
+        <Box sx={{ 
+          bgcolor: 'grey.900', 
+          color: 'white', 
+          py: 8,
+          position: 'relative',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '1px',
+            background: 'linear-gradient(90deg, transparent 0%, rgba(102, 126, 234, 0.5) 50%, transparent 100%)',
+          }
+        }}>
         <Container maxWidth="lg">
           <Grid container spacing={6}>
             <Grid item xs={12} md={4}>
@@ -1005,8 +1422,9 @@ const LandingPage: React.FC = () => {
               </Typography>
             </Box>
           </Box>
-      </Container>
-      </Box>
+        </Container>
+        </Box>
+      </motion.div>
     </Box>
   )
 }

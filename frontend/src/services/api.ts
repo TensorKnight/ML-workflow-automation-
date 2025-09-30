@@ -1,11 +1,12 @@
 import axios from 'axios'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://d134e8b872e7.ngrok-free.app'
 
 const api = axios.create({
-  baseURL: `${API_BASE_URL}/api/v1`,
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
+    'ngrok-skip-browser-warning': 'true',
   },
 })
 
@@ -31,11 +32,11 @@ api.interceptors.response.use(
 )
 
 export interface Project {
-  id: string
+  id: number
+  unique_id: string
   name: string
   description?: string
-  problem_type: 'classification' | 'regression'
-  status: 'created' | 'processing' | 'completed' | 'failed'
+  problem_type: 'classification' | 'regression' | 'clustering'
   created_at: string
   updated_at: string
 }
@@ -88,27 +89,47 @@ export interface BackgroundJob {
   created_at: string
 }
 
-// Project API
+// Project API (using workflows endpoint)
 export const projectApi = {
-  // Get all projects
-  getProjects: () => api.get<Project[]>('/projects/'),
+  // Get all projects (workflows)
+  getProjects: (skip: number = 0, limit: number = 100, problem_type?: string) => 
+    api.get<{workflows: Project[], total: number, skip: number, limit: number}>(`/workflows/?skip=${skip}&limit=${limit}${problem_type ? `&problem_type=${problem_type}` : ''}`),
   
   // Get project by ID
-  getProject: (id: string) => api.get<Project>(`/projects/${id}`),
+  getProject: (id: number) => api.get<Project>(`/workflows/${id}`),
+  
+  // Get project by unique ID
+  getProjectByUniqueId: (uniqueId: string) => api.get<Project>(`/workflows/unique/${uniqueId}`),
   
   // Create new project
   createProject: (data: {
     name: string
     description?: string
-    problem_type: 'classification' | 'regression'
-  }) => api.post<Project>('/projects/', data),
+    problem_type: 'classification' | 'regression' | 'clustering'
+  }) => api.post<Project>('/workflows/', data),
   
   // Update project
-  updateProject: (id: string, data: Partial<Project>) => 
-    api.put<Project>(`/projects/${id}`, data),
+  updateProject: (id: number, data: {
+    name?: string
+    description?: string
+    problem_type?: 'classification' | 'regression' | 'clustering'
+  }) => api.put<Project>(`/workflows/${id}`, data),
   
   // Delete project
-  deleteProject: (id: string) => api.delete(`/projects/${id}`),
+  deleteProject: (id: number) => api.delete(`/workflows/${id}`),
+}
+
+// ML Execution API
+export const mlExecutionApi = {
+  // Run ML pipeline
+  runPipeline: (data: {
+    workflow_id: number
+    dataset_path: string
+    problem_type: string
+  }) => api.post('/ml-execution/run-pipeline', data),
+
+  // Test ML connection
+  testConnection: () => api.get('/ml-execution/test-connection'),
 }
 
 // Dataset API

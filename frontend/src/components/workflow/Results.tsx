@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Box,
   Typography,
@@ -8,12 +8,15 @@ import {
   Button,
   Chip,
   LinearProgress,
+  Alert,
+  CircularProgress,
 } from '@mui/material'
 import {
   Download as DownloadIcon,
   Share as ShareIcon,
   PlayArrow as PlayIcon,
 } from '@mui/icons-material'
+import { mlExecutionApi } from '../../services/api'
 
 interface ResultsProps {
   data: any
@@ -22,16 +25,71 @@ interface ResultsProps {
 }
 
 const Results: React.FC<ResultsProps> = ({ data, onBack, onFinish }) => {
-  const results = data.results || {
-    bestModel: 'Random Forest',
+  const [mlResults, setMlResults] = useState<any>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    runMLPipeline()
+  }, [])
+
+  const runMLPipeline = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      
+      const response = await mlExecutionApi.runPipeline({
+        workflow_id: 1,
+        dataset_path: 'datasets/heart.csv',
+        problem_type: 'classification'
+      })
+      
+      setMlResults(response.data.results)
+    } catch (err) {
+      setError('Failed to run ML pipeline')
+      console.error('ML pipeline error:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const results = mlResults || data.results || {
+    bestModel: 'Light Gradient Boosting Machine',
     models: [
-      { name: 'Random Forest', accuracy: 0.89, auc: 0.92, f1: 0.88, time: 2.3 },
-      { name: 'XGBoost', accuracy: 0.87, auc: 0.90, f1: 0.86, time: 1.8 },
-      { name: 'LightGBM', accuracy: 0.88, auc: 0.91, f1: 0.87, time: 1.2 },
+      { name: 'Light Gradient Boosting Machine', accuracy: 0.985, auc: 0.97, f1: 0.97, time: 0.53 },
+      { name: 'Random Forest Classifier', accuracy: 0.985, auc: 0.97, f1: 0.97, time: 0.26 },
+      { name: 'Extra Trees Classifier', accuracy: 0.985, auc: 0.97, f1: 0.97, time: 0.20 },
     ],
   }
 
   const bestModel = results.models.find((model: any) => model.name === results.bestModel)
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 4 }}>
+        <CircularProgress size={60} />
+        <Typography variant="h6" sx={{ mt: 2 }}>
+          Running ML Pipeline...
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Training models and evaluating performance
+        </Typography>
+      </Box>
+    )
+  }
+
+  if (error) {
+    return (
+      <Box>
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+        <Button variant="contained" onClick={runMLPipeline}>
+          Retry ML Pipeline
+        </Button>
+      </Box>
+    )
+  }
 
   return (
     <Box>

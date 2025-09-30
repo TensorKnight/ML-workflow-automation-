@@ -13,9 +13,16 @@ import {
   Select,
   MenuItem,
   Grid,
+  Button,
+  Alert,
 } from '@mui/material'
+import { ArrowForward as ArrowForwardIcon } from '@mui/icons-material'
 
-const Preprocessing: React.FC = () => {
+interface PreprocessingProps {
+  onNext?: () => void
+}
+
+const Preprocessing: React.FC<PreprocessingProps> = ({ onNext }) => {
   const [config, setConfig] = useState({
     imputation: {
       mean: ['age', 'trestbps', 'chol'],
@@ -34,6 +41,8 @@ const Preprocessing: React.FC = () => {
       action: 'cap',
     },
   })
+  const [isCompleted, setIsCompleted] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false)
 
   const handleConfigChange = (section: string, key: string, value: any) => {
     setConfig((prev) => ({
@@ -45,11 +54,58 @@ const Preprocessing: React.FC = () => {
     }))
   }
 
+  const handleProcessData = async () => {
+    setIsProcessing(true)
+    
+    // Simulate preprocessing
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    
+    setIsProcessing(false)
+    setIsCompleted(true)
+  }
+
   return (
     <Box>
-      <Typography variant="h6" gutterBottom>
-        Data Preprocessing Configuration
-      </Typography>
+      {!isCompleted ? (
+        <>
+          <Typography variant="h6" gutterBottom>
+            Data Preprocessing Configuration
+          </Typography>
+          <Typography variant="body2" color="text.secondary" gutterBottom>
+            Configure preprocessing steps for the heart disease dataset
+          </Typography>
+        </>
+      ) : (
+        <>
+          <Typography variant="h6" gutterBottom>
+            ✅ Data Preprocessing Completed
+          </Typography>
+          <Typography variant="body2" color="text.secondary" gutterBottom>
+            Heart disease dataset has been preprocessed and is ready for feature engineering
+          </Typography>
+          <Alert severity="success" sx={{ mt: 2 }}>
+            Preprocessing completed successfully! Dataset is ready for feature selection.
+          </Alert>
+          
+          {onNext && (
+            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+              <Button
+                variant="contained"
+                endIcon={<ArrowForwardIcon />}
+                onClick={onNext}
+                sx={{
+                  background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
+                  '&:hover': {
+                    background: 'linear-gradient(45deg, #1565c0, #1976d2)',
+                  }
+                }}
+              >
+                Next: Feature Selection
+              </Button>
+            </Box>
+          )}
+        </>
+      )}
 
       <Grid container spacing={3}>
         <Grid item xs={12} md={6}>
@@ -240,6 +296,27 @@ const Preprocessing: React.FC = () => {
           </Card>
         </Grid>
       </Grid>
+
+      {!isCompleted && (
+        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+          <Button
+            variant="contained"
+            size="large"
+            onClick={handleProcessData}
+            disabled={isProcessing}
+            sx={{ 
+              px: 4,
+              py: 1.5,
+              background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
+              '&:hover': {
+                background: 'linear-gradient(45deg, #1565c0, #1976d2)',
+              }
+            }}
+          >
+            {isProcessing ? 'Processing Data...' : 'Process Data →'}
+          </Button>
+        </Box>
+      )}
     </Box>
   )
 }

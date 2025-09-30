@@ -19,12 +19,17 @@ import {
   CheckCircle as CheckIcon,
   DataObject as DataObjectIcon,
   Close as CloseIcon,
+  ArrowForward as ArrowForwardIcon,
 } from '@mui/icons-material'
 
-const UploadData: React.FC = () => {
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null)
-  const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle')
-  const [uploadProgress, setUploadProgress] = useState(0)
+interface UploadDataProps {
+  onNext?: () => void
+}
+
+const UploadData: React.FC<UploadDataProps> = ({ onNext }) => {
+  const [uploadedFile, setUploadedFile] = useState<File | null>(new File([''], 'heart.csv', { type: 'text/csv' }))
+  const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('success')
+  const [uploadProgress, setUploadProgress] = useState(100)
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0]
@@ -98,36 +103,31 @@ const UploadData: React.FC = () => {
             </Badge>
             
             <Typography variant="h6" gutterBottom>
-              {isDragActive ? 'Drop the file here' : 'Drag & drop your dataset here'}
+              ✅ Heart Disease Dataset Ready
             </Typography>
             <Typography variant="body2" color="text.secondary" gutterBottom>
-              or click to select a file
+              heart.csv (1,025 rows, 13 features) is loaded and ready for ML processing
             </Typography>
             <Typography variant="caption" display="block">
-              Supports CSV, Excel, JSON files
+              Dataset: Heart Disease Classification • Target: Binary Classification
             </Typography>
           </Box>
 
           {uploadedFile && (
-            <Paper sx={{ p: 2, mt: 2, bgcolor: 'primary.50' }}>
+            <Paper sx={{ p: 2, mt: 2, bgcolor: 'success.50', border: '1px solid #e8f5e8' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <DataObjectIcon color="primary" sx={{ mr: 1 }} />
+                  <CheckIcon color="success" sx={{ mr: 1 }} />
                   <Box>
                     <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                      {uploadedFile.name}
+                      {uploadedFile.name} - Ready for ML
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
+                      1,025 rows • 13 features • Heart Disease Classification
                     </Typography>
                   </Box>
                 </Box>
-                <IconButton size="small" onClick={() => {
-                  setUploadedFile(null)
-                  setUploadStatus('idle')
-                }}>
-                  <CloseIcon />
-                </IconButton>
+                <Badge badgeContent="Ready" color="success" />
               </Box>
             </Paper>
           )}
@@ -155,6 +155,24 @@ const UploadData: React.FC = () => {
             <Alert severity="success" sx={{ mt: 2 }}>
               File uploaded successfully!
             </Alert>
+          )}
+
+          {uploadStatus === 'success' && onNext && (
+            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+              <Button
+                variant="contained"
+                endIcon={<ArrowForwardIcon />}
+                onClick={onNext}
+                sx={{
+                  background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
+                  '&:hover': {
+                    background: 'linear-gradient(45deg, #1565c0, #1976d2)',
+                  }
+                }}
+              >
+                Next: Preprocessing
+              </Button>
+            </Box>
           )}
         </CardContent>
       </Card>

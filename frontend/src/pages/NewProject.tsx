@@ -9,8 +9,18 @@ import {
   Button,
   Card,
   CardContent,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
+import { projectApi } from '../services/api'
 import DataUpload from '../components/workflow/DataUploadSimple'
 import DataPreprocessing from '../components/workflow/DataPreprocessing'
 import FeatureEngineering from '../components/workflow/FeatureEngineering'
@@ -28,6 +38,13 @@ const steps = [
 const NewProject: React.FC = () => {
   const [activeStep, setActiveStep] = useState(0)
   const [projectData, setProjectData] = useState<any>({})
+  const [showProjectDialog, setShowProjectDialog] = useState(true)
+  const [newProject, setNewProject] = useState({
+    name: '',
+    description: '',
+    problemType: 'classification' as const,
+  })
+  const [createdProject, setCreatedProject] = useState<any>(null)
   const navigate = useNavigate()
 
   const handleNext = () => {
@@ -43,6 +60,20 @@ const NewProject: React.FC = () => {
       ...prev,
       ...stepData,
     }))
+  }
+
+  const handleCreateProject = async () => {
+    try {
+      const response = await projectApi.createProject({
+        name: newProject.name,
+        description: newProject.description,
+        problem_type: newProject.problemType,
+      })
+      setCreatedProject(response.data)
+      setShowProjectDialog(false)
+    } catch (error) {
+      console.error('Error creating project:', error)
+    }
   }
 
   const renderStepContent = (step: number) => {
@@ -115,6 +146,52 @@ const NewProject: React.FC = () => {
           </Box>
         </CardContent>
       </Card>
+
+      {/* Project Creation Dialog */}
+      <Dialog open={showProjectDialog} onClose={() => navigate('/')} maxWidth="sm" fullWidth>
+        <DialogTitle>Create New Project</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Project Name"
+            fullWidth
+            variant="outlined"
+            value={newProject.name}
+            onChange={(e) => setNewProject({ ...newProject, name: e.target.value })}
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            margin="dense"
+            label="Description"
+            fullWidth
+            multiline
+            rows={3}
+            variant="outlined"
+            value={newProject.description}
+            onChange={(e) => setNewProject({ ...newProject, description: e.target.value })}
+            sx={{ mb: 2 }}
+          />
+          <FormControl fullWidth>
+            <InputLabel>Problem Type</InputLabel>
+            <Select
+              value={newProject.problemType}
+              label="Problem Type"
+              onChange={(e) => setNewProject({ ...newProject, problemType: e.target.value as any })}
+            >
+              <MenuItem value="classification">Classification</MenuItem>
+              <MenuItem value="regression">Regression</MenuItem>
+              <MenuItem value="clustering">Clustering</MenuItem>
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => navigate('/')}>Cancel</Button>
+          <Button onClick={handleCreateProject} variant="contained" disabled={!newProject.name}>
+            Create Project
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   )
 }
